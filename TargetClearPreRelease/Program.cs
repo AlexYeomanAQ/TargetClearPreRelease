@@ -17,7 +17,6 @@ namespace TargetClearCS
 
         static void Main(string[] args)
         {
-            int numberOfBigNumbers = 0;
             List<int> NumbersAllowed = new List<int>();
             List<int> Targets;
             int MaxNumberOfTargets = 20;
@@ -40,32 +39,13 @@ namespace TargetClearCS
                 MaxTarget = 50;
                 TrainingGame = false;
                 Targets = CreateTargets(MaxNumberOfTargets, MaxTarget);
-                Console.WriteLine("What Difficulty would you like: Standard, Easy, Medium, Hard");
-                string difficulty = Console.ReadLine();
-                switch (difficulty.ToLower())
-                {
-                    case "easy":
-                    case "2":
-                        numberOfBigNumbers = 1;
-                        break;
-                    case "medium":
-                    case "3":
-                        numberOfBigNumbers = 2;
-                        break;
-                    case "hard":
-                    case "4":
-                        numberOfBigNumbers = 4;
-                        break;
-                    default:
-                        break;
-                }
             }
-            NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber, numberOfBigNumbers);
-            PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber, numberOfBigNumbers);
+            NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber);
+            PlayGame(Targets, NumbersAllowed, TrainingGame, MaxTarget, MaxNumber);
             Console.ReadLine();
         }
 
-        static void PlayGame(List<int> Targets, List<int> NumbersAllowed, bool TrainingGame, int MaxTarget, int MaxNumber, int numberOfBigNumbers)
+        static void PlayGame(List<int> Targets, List<int> NumbersAllowed, bool TrainingGame, int MaxTarget, int MaxNumber)
         {
             int Score = 0;
             bool GameOver = false;
@@ -85,7 +65,7 @@ namespace TargetClearCS
                         if (CheckIfUserInputEvaluationIsATarget(Targets, UserInputInRPN, ref Score))
                         {
                             RemoveNumbersUsed(UserInput, MaxNumber, NumbersAllowed);
-                            NumbersAllowed = FillNumbers(new List<int>(), TrainingGame, MaxNumber, numberOfBigNumbers);
+                            NumbersAllowed = FillNumbers(NumbersAllowed, TrainingGame, MaxNumber);
                         }
                     }
                 }
@@ -139,7 +119,11 @@ namespace TargetClearCS
 
         static void UpdateTargets(List<int> Targets, bool TrainingGame, int MaxTarget)
         {
-            Targets.Remove(0);
+            for (int Count = 0; Count < Targets.Count - 1; Count++)
+            {
+                Targets[Count] = Targets[Count + 1];
+            }
+            Targets.RemoveAt(Targets.Count - 1);
             if (TrainingGame)
             {
                 Targets.Add(Targets[Targets.Count - 1]);
@@ -375,7 +359,7 @@ namespace TargetClearCS
             return Targets;
         }
 
-        static List<int> FillNumbers(List<int> NumbersAllowed, bool TrainingGame, int MaxNumber, int numberOfBigNumbers)
+        static List<int> FillNumbers(List<int> NumbersAllowed, bool TrainingGame, int MaxNumber)
         {
             if (TrainingGame)
             {
@@ -385,18 +369,8 @@ namespace TargetClearCS
             {
                 while (NumbersAllowed.Count < 5)
                 {
-                    if (NumbersAllowed.Count < 5- numberOfBigNumbers)
-                    {
-                        NumbersAllowed.Add(GetNumber(MaxNumber));
-                    }
-                    else
-                    {
-                        int[] bigNumbers = new int[] { 25, 50, 75, 100 };
-                        Random r = new Random();
-                        NumbersAllowed.Add(bigNumbers[r.Next(0, bigNumbers.Length - 1)]);
-                    }
+                    NumbersAllowed.Add(GetNumber(MaxNumber));
                 }
-                
                 return NumbersAllowed;
             }
         }
